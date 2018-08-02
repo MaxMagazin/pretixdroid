@@ -32,13 +32,16 @@ import eu.pretix.pretixdroid.R
 class SettingsFragment : PreferenceFragment() {
 
     private fun resetApp() {
-        //        DaoSession daoSession = ((PretixDroid) getActivity().getApplication()).getDaoSession();
-        //        daoSession.getQueuedCheckInDao().deleteAll();
-        //        daoSession.getTicketDao().deleteAll();
-
-        val config = AppConfig(activity)
-        config.resetEventConfig()
-        Toast.makeText(activity, R.string.reset_success, Toast.LENGTH_SHORT).show()
+        AlertDialog.Builder(activity)
+                .setMessage(R.string.pref_reset_warning)
+                .setNegativeButton(getString(R.string.cancel)) { dialog, whichButton ->
+                    // do nothing
+                }
+                .setPositiveButton(getString(R.string.ok)) { dialog, whichButton ->
+                    val config = AppConfig(activity)
+                    config.resetEventConfig()
+                    Toast.makeText(activity, R.string.reset_success, Toast.LENGTH_SHORT).show()
+                }.create().show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +55,7 @@ class SettingsFragment : PreferenceFragment() {
             val cnt = (activity.application as PretixDroid).data.count(QueuedCheckIn::class.java).get().value().toLong()
             if (cnt > 0) {
                 AlertDialog.Builder(activity)
-                        .setMessage(R.string.pref_reset_warning)
+                        .setMessage(R.string.pref_reset_sync_warning)
                         .setNegativeButton(getString(R.string.cancel)) { dialog, whichButton ->
                             // do nothing
                         }
@@ -92,6 +95,18 @@ class SettingsFragment : PreferenceFragment() {
                             }.create().show()
 
                     return@OnPreferenceChangeListener false
+                }
+            }
+            true
+        }
+
+        val ble_printing_enabled = findPreference("ble_printing") as CheckBoxPreference
+        ble_printing_enabled.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
+            val config = AppConfig(activity)
+            if (newValue is Boolean && newValue != config.asyncModeEnabled) {
+                if (newValue) {
+                    config.blePrintingEnabled = true
+                    ble_printing_enabled.isChecked = true
                 }
             }
             true
