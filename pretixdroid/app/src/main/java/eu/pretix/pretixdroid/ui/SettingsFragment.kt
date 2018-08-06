@@ -115,6 +115,7 @@ class SettingsFragment : PreferenceFragment() {
                 return@OnPreferenceClickListener true
             }
         }
+
     }
 
     private fun asset_dialog(@RawRes htmlRes: Int, @StringRes title: Int) {
