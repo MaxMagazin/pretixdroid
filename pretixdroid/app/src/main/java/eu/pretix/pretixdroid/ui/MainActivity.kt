@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.*
 import android.content.pm.PackageManager
@@ -78,9 +79,6 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
     private val TAG = MainActivity::class.java.simpleName
     private var mDeviceName: String? = null
     private var mDeviceAddress: String? = null
-    private var mConnected = false
-    //private var blePrinterReady: Boolean = false
-    private var manuallyDisconnected: Boolean = false
 
     private val mServiceConnection = object : ServiceConnection {
 
@@ -92,7 +90,6 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
                 finish()
             }
             // Automatically connects to the device upon successful start-up initialization.
-//            mBluetoothLeService!!.connect(mDeviceAddress)
             connectGatt()
         }
 
@@ -115,20 +112,15 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
                 BluetoothLeService.ACTION_GATT_CONNECTED -> {
                     Log.i(TAG, "ACTION_GATT_CONNECTED")
                     invalidateOptionsMenu()
-                    manuallyDisconnected = false
-                    mConnected = true
+                    config!!.bleConnected = true
                 }
 
                 BluetoothLeService.ACTION_GATT_DISCONNECTED -> {
                     Log.i(TAG, "ACTION_GATT_DISCONNECTED")
                     invalidateOptionsMenu()
-                    mConnected = false
+                    config!!.bleConnected = false
 
-                    // Try to reconnect immediately if not disconnected manually
-                    if (!manuallyDisconnected) {
-//                        mBluetoothLeService!!.connect(mDeviceAddress)
-                        connectGatt()
-                    }
+                    connectGatt()
                 }
 
                 BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED -> {
@@ -173,12 +165,18 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
     }
 
     private fun connectGatt() {
-        val result = mBluetoothLeService!!.connect(mDeviceAddress)
-        Log.d(TAG, "GATT Connect request result=$result")
-        if (!result) {
-            Toast.makeText(this,
-                    "Connect attempt failed!",
-                    Toast.LENGTH_LONG).show()
+        if (config!!.blePrintingEnabled) {
+            if (BluetoothAdapter.checkBluetoothAddress(mDeviceAddress)) {
+                val result = mBluetoothLeService!!.connect(mDeviceAddress)
+                Log.d(TAG, "GATT Connect request result=$result")
+                if (!result) {
+                    Toast.makeText(this,
+                            "Connect attempt failed!",
+                            Toast.LENGTH_LONG).show()
+                }
+            }
+        } else {
+            Log.d(TAG, "GATT Connect request: \"${mDeviceAddress}\" is not a valid Bluetooth Address!")
         }
     }
 
@@ -321,18 +319,14 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
             unregisterReceiver(scanReceiver)
         }
         timer!!.cancel()
-        if (config!!.blePrintingEnabled) {
-            unregisterReceiver(mGattUpdateReceiver)
-        }
+
+        unregisterReceiver(mGattUpdateReceiver)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (config!!.blePrintingEnabled) {
-            unbindService(mServiceConnection)
-            mBluetoothLeService = null
-        }
-//        blePrinterReady = false
+        unbindService(mServiceConnection)
+        mBluetoothLeService = null
     }
 
     override fun handleResult(rawResult: Result) {
@@ -529,12 +523,27 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
     private fun printBadge(checkResult: TicketCheckProvider.CheckResult) {
         if (checkResult.attendee_name != null && checkResult.attendee_name != "null") {
             val sat = if (checkResult.isRequireAttention) "Special Attention Ticket" else " " // FIXME: printer still requires whitespace
-            if (mConnected) {
 
+            if (!config!!.blePrintingEnabled) {
+                Log.d(TAG, "BLE Printing disabled")
+                Toast.makeText(this,
+                        R.string.printing_disabled,
+                        Toast.LENGTH_SHORT).show()
+            } else if (!config!!.bleConnected || mBluetoothLeService == null) {
+                Log.d(TAG, "Printer disconnected")
+                Toast.makeText(this,
+                        R.string.printer_disconnected,
+                        Toast.LENGTH_SHORT).show()
+            } else if (mBluetoothLeService!!.uartTxCharacteristic == null) {
+                Log.d(TAG, "Printer connection error")
+                Toast.makeText(this,
+                        R.string.printer_connection_error,
+                        Toast.LENGTH_SHORT).show()
+            } else {
+                // All clear, print away!
                 mBluetoothLeService!!.writeUartData(
                         mBluetoothLeService!!.uartTxCharacteristic as BluetoothGattCharacteristic,
                         buildUartPrinterString(checkResult.attendee_name, sat, checkResult.orderCode))
-            } else {
 //                mqttManager?.publish(checkResult.getAttendee_name() + ";" + sat + ";" + checkResult.getOrderCode());
             }
         } else {
