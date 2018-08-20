@@ -51,7 +51,7 @@ public class SyncService extends IntentService {
                 upload_interval,
                 download_interval
         );
-        sm.sync();
+        sm.sync(true);
     }
 
 }

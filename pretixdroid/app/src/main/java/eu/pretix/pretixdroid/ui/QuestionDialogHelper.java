@@ -130,10 +130,10 @@ public class QuestionDialogHelper {
                 case C:
                     Spinner fieldC = new Spinner(ctx);
                     List<QuestionOption> opts = ra.getQuestion().getOptions();
-                    QuestionOption emptyOpt = new QuestionOption();
-                    emptyOpt.setServer_id(0L);
-                    emptyOpt.setValue("");
-                    opts.add(0, emptyOpt);
+//                    QuestionOption emptyOpt = new QuestionOption();   //FIXME: temp comment it out to make it working
+//                    emptyOpt.setServer_id(0L);
+//                    emptyOpt.setValue("");
+//                    opts.add(0, emptyOpt);
                     fieldC.setAdapter(new OptionAdapter(ctx, opts));
                     int i = 0;
                     for (QuestionOption opt : ra.getQuestion().getOptions()) {

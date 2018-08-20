@@ -268,7 +268,8 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
                 if (jsonObject.getInt("version") < 3) {
                     config.setAsyncModeEnabled(false);
                 }
-                config.setEventConfig(jsonObject.getString("url"), jsonObject.getString("key"),
+                //config.setEventConfig(jsonObject.getString("url"), jsonObject.getString("key"),
+                config.setEventConfig(jsonObject.getString("apiurl"), jsonObject.getString("apikey"),   //FIXME: Update for Silpion Event config
                         jsonObject.getInt("version"), jsonObject.optBoolean("show_info", true),
                         jsonObject.optBoolean("allow_search", true));
                 checkProvider = ((PretixDroid) getApplication()).getNewCheckProvider();
@@ -410,6 +411,23 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         protected void onPostExecute(TicketCheckProvider.CheckResult checkResult) {
             displayScanResult(checkResult, answers, ignore_unpaid);
             triggerSync();
+        }
+    }
+
+    public class DownloadPositionsTask extends AsyncTask<Void, Void, Void> { //TODO: finish
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
         }
     }
 

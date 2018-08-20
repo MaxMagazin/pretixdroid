@@ -82,6 +82,11 @@ public class AppConfig implements ConfigStore {
         return prefs.getString(PREFS_KEY_API_KEY, "");
     }
 
+    @Override
+    public String getEventSlug() {
+        return null; //FIXME: proper implementation
+    }
+
     public boolean getShowInfo() {
         return prefs.getBoolean(PREFS_KEY_SHOW_INFO, true);
     }
@@ -136,6 +141,11 @@ public class AppConfig implements ConfigStore {
 
     public void setLastStatusData(String val) {
         prefs.edit().putString(PREFS_KEY_LAST_STATUS_DATA, val).apply();
+    }
+
+    @Override
+    public Long getPosId() {
+        return null; //FIXME: proper implementation
     }
 
     public long getLastDownload() {
