@@ -47,6 +47,7 @@ import java.util.TimerTask;
 
 import eu.pretix.libpretixsync.api.PretixApi;
 import eu.pretix.libpretixsync.check.TicketCheckProvider;
+import eu.pretix.libpretixsync.db.OrderPosition;
 import eu.pretix.libpretixsync.db.QueuedCheckIn;
 import eu.pretix.pretixdroid.AppConfig;
 import eu.pretix.pretixdroid.BuildConfig;
@@ -400,8 +401,20 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
             String secret = (String) params[0];
             answers = (List<TicketCheckProvider.Answer>) params[1];
             ignore_unpaid = (boolean) params[2];
+
             if (secret.matches("[0-9A-Za-z-]+")) {
-                return checkProvider.check(secret, answers, ignore_unpaid);
+
+                List<OrderPosition> orderPositions = ((PretixDroid) getApplication()).getData().select(OrderPosition.class)
+                    .where(OrderPosition.SECRET.eq(secret))
+                    .get().toList();
+
+                if (orderPositions.size() == 0) {
+                    return new TicketCheckProvider.CheckResult(TicketCheckProvider.CheckResult.Type.INVALID, getString(R.string.scan_result_invalid));
+                }
+
+                OrderPosition orderPosition = orderPositions.get(0);
+
+                return checkProvider.check(String.valueOf(orderPosition.getServer_id()), answers, ignore_unpaid);
             } else {
                 return new TicketCheckProvider.CheckResult(TicketCheckProvider.CheckResult.Type.INVALID, getString(R.string.scan_result_invalid));
             }
@@ -411,23 +424,6 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         protected void onPostExecute(TicketCheckProvider.CheckResult checkResult) {
             displayScanResult(checkResult, answers, ignore_unpaid);
             triggerSync();
-        }
-    }
-
-    public class DownloadPositionsTask extends AsyncTask<Void, Void, Void> { //TODO: finish
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
         }
     }
 

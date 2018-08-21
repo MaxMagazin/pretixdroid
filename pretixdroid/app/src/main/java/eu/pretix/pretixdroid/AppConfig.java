@@ -84,7 +84,7 @@ public class AppConfig implements ConfigStore {
 
     @Override
     public String getEventSlug() {
-        return null; //FIXME: proper implementation
+        return "devtest"; //FIXME: proper implementation
     }
 
     public boolean getShowInfo() {
