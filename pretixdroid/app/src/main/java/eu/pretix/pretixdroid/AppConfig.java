@@ -84,7 +84,7 @@ public class AppConfig implements ConfigStore {
 
     @Override
     public String getEventSlug() {
-        return "devtest"; //FIXME: proper implementation
+        return ""; //TODO: Should be used? Url from config includes already event slug value
     }
 
     public boolean getShowInfo() {

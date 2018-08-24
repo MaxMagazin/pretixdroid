@@ -25,6 +25,8 @@ public class PretixDroid extends Application {
     public static final String KEYSTORE_PASSWORD = "ZnDNUkQ01PVZyD7oNP3a8DVXrvltxD";
     private BlockingEntityStore<Persistable> dataStore;
 
+    public static final String DB_NAME = "pretixDroidDb";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -37,7 +39,7 @@ public class PretixDroid extends Application {
     public BlockingEntityStore<Persistable> getData() {
         if (dataStore == null) {
             // override onUpgrade to handle migrating to a new version
-            DatabaseSource source = new DatabaseSource(this, Models.DEFAULT, "silpi_db", 5);
+            DatabaseSource source = new DatabaseSource(this, Models.DEFAULT, DB_NAME, 5);
             Configuration configuration = source.getConfiguration();
             dataStore = new EntityDataStore<Persistable>(configuration);
         }
