@@ -52,7 +52,7 @@ public class PretixDroid extends Application {
         if (config.getAsyncModeEnabled()) {
             p = new AsyncCheckProvider(config, getData());
         } else {
-            p = new OnlineCheckProvider(config, new AndroidHttpClientFactory());
+            p = new OnlineCheckProvider(config, new AndroidHttpClientFactory(), getData());
         }
         p.setSentry(new AndroidSentryImplementation());
         return p;

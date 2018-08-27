@@ -7,7 +7,7 @@
             android:summary="@string/hint_clear_config"
             android:title="@string/action_clear_config" />
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="async"
             android:summaryOn="@string/pref_async_hint_on"
             android:summaryOff="@string/pref_async_hint_off"

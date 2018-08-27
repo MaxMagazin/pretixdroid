@@ -73,7 +73,7 @@ public class EventinfoActivity extends AppCompatActivity {
         Exception e;
 
         /**
-         * exexutes an asyncron request to obtain status information from the pretix instance
+         * executes an asyncron request to obtain status information from the pretix instance
          *
          * @param params are ignored
          * @return the associated json object recieved from the pretix-endpoint or null if the request was not successful

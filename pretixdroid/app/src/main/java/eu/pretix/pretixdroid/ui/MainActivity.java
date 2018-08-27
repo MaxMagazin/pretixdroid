@@ -401,20 +401,8 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
             String secret = (String) params[0];
             answers = (List<TicketCheckProvider.Answer>) params[1];
             ignore_unpaid = (boolean) params[2];
-
             if (secret.matches("[0-9A-Za-z-]+")) {
-
-                List<OrderPosition> orderPositions = ((PretixDroid) getApplication()).getData().select(OrderPosition.class)
-                    .where(OrderPosition.SECRET.eq(secret))
-                    .get().toList();
-
-                if (orderPositions.size() == 0) {
-                    return new TicketCheckProvider.CheckResult(TicketCheckProvider.CheckResult.Type.INVALID, getString(R.string.scan_result_invalid));
-                }
-
-                OrderPosition orderPosition = orderPositions.get(0);
-
-                return checkProvider.check(String.valueOf(orderPosition.getServer_id()), answers, ignore_unpaid);
+                return checkProvider.check(secret, answers, ignore_unpaid);
             } else {
                 return new TicketCheckProvider.CheckResult(TicketCheckProvider.CheckResult.Type.INVALID, getString(R.string.scan_result_invalid));
             }
