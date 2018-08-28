@@ -48,6 +48,7 @@ public class SyncService extends IntentService {
                 api,
                 new AndroidSentryImplementation(),
                 dataStore,
+                null,
                 upload_interval,
                 download_interval
         );
