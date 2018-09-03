@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "eu.pretix.pretixdroid"
-        minSdkVersion 16
+        minSdkVersion 23
         targetSdkVersion 27
         versionCode 12
         versionName "1.10"

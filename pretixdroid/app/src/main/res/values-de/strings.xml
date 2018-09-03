@@ -44,6 +44,7 @@
     <string name="pref_camera_hint">Deaktivieren Sie diese Option, wenn Ihr Gerät einen eingebauten Barcode-Scanner hat. Dies funktioniert derzeit nur bei wenigen Geräten.</string>
     <string name="pref_head_connection">Verbindung</string>
     <string name="pref_head_other">Sonstiges</string>
+    <string name="pref_head_printing">Drucken</string>
     <string name="pref_head_scan">Scannen</string>
     <string name="reset_success">Sie können nun einen neuen Konfigurations-Code scannen</string>
     <string name="pref_async">Asynchrones Scannen (beta)</string>
@@ -51,7 +52,8 @@
     <string name="pref_async_hint_off">Gescannte Tickets werden direkt mit dem Server abgeglichen. Die App benötigt eine Internetverbindung.</string>
     <string name="pref_async_not_supported">Asynchrones Scannen wird von Ihrem pretix-Server nicht unterstützt. Bitte prüfen Sie pretix auf Updates.</string>
     <string name="pref_async_warning">Wenn Sie asynchrones Scannen anschalten, wird dieses Gerät nicht immer den aktuellesten Stand der Datenbank kennen. Das kann, beispielsweise wenn Sie mehrere Geräte einsetzen, dazu führen, dass das selbe Ticket auf zwei verschiedenen Geräten zweimal als gültig angezeigt wird, wenn in kurzer Folge mehrfach gescannt wird.</string>
-    <string name="pref_reset_warning">Die App ist nicht voll synchronisiert. Wenn Sie sie nun zurücksetzen, könnten einige auf diesem Gerät geschehene Checkins dauerhaft verloren gehen.</string>
+    <string name="pref_reset_warning">Konfiguration zurücksetzen?</string>
+    <string name="pref_reset_sync_warning">Die App ist nicht voll synchronisiert. Wenn Sie sie nun zurücksetzen, könnten einige auf diesem Gerät geschehene Checkins dauerhaft verloren gehen.</string>
     <plurals name="time_minutes">
         <item quantity="one">%d Minute</item>
         <item quantity="other">%d Minuten</item>
@@ -79,4 +81,18 @@
     <string name="dialog_unpaid_title">Unbezahlte Bestellung</string>
     <string name="dialog_unpaid_text">Dieses Ticket gehört zu einer Bestellung die noch nicht bezahlt wurde. Möchten Sie den Teilnehmer trotzdem einchecken? Die Bestellung wird dadurch NICHT auf bezahlt gestellt.</string>
     <string name="dialog_unpaid_retry">Trotzdem einchecken</string>
+    <string name="action_blescan">BLE Drucker suchen</string>
+    <string name="menu_connect">BLE Drucker verbinden</string>
+    <string name="menu_disconnect">BLE Drucker trennen</string>
+    <string name="menu_print_test_ticket">Testticket drucken</string>
+    <string name="pref_printer_enable">BLE-Druck benutzen</string>
+    <string name="pref_printer_print_immediately">Badge sofort drucken</string>
+    <string name="print_test_badge">Test-Badge drucken</string>
+    <string name="scan_timeout">Suche beendet</string>
+    <string name="no_devices_found">Keine BLE-Drucker gefunden</string>
+    <string name="printing_disabled">Druck ist deaktiviert</string>
+    <string name="printer_disconnected">Drucker nicht verbunden</string>
+    <string name="printer_connection_error">Drucker Verbindungsfehler</string>
+    <string name="menu_connected">BLE verbunden</string>
+    <string name="menu_disconnected">BLE getrennt</string>
 </resources>

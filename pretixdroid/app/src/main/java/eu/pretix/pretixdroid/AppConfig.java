@@ -2,29 +2,33 @@ package eu.pretix.pretixdroid;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.preference.PreferenceManager;
 
 import eu.pretix.libpretixsync.api.PretixApi;
 import eu.pretix.libpretixsync.config.ConfigStore;
 
 public class AppConfig implements ConfigStore {
-    public static final String PREFS_NAME = "pretixdroid";
-    public static final String PREFS_KEY_API_URL = "pretix_api_url";
-    public static final String PREFS_KEY_API_KEY = "pretix_api_key";
-    public static final String PREFS_KEY_SHOW_INFO = "show_info";
-    public static final String PREFS_KEY_ALLOW_SEARCH = "allow_search";
-    public static final String PREFS_KEY_API_VERSION = "pretix_api_version";
-    public static final String PREFS_KEY_FLASHLIGHT = "flashlight";
-    public static final String PREFS_KEY_AUTOFOCUS = "autofocus";
-    public static final String PREFS_KEY_CAMERA = "camera";
-    public static final String PREFS_KEY_ASYNC_MODE = "async";
-    public static final String PREFS_PLAY_AUDIO = "playaudio";
-    public static final String PREFS_KEY_LAST_SYNC = "last_sync";
-    public static final String PREFS_KEY_LAST_FAILED_SYNC = "last_failed_sync";
-    public static final String PREFS_KEY_LAST_FAILED_SYNC_MSG = "last_failed_sync_msg";
-    public static final String PREFS_KEY_LAST_DOWNLOAD = "last_download";
-    public static final String PREFS_KEY_LAST_STATUS_DATA = "last_status_data";
+    private static final String PREFS_NAME = "pretixdroid";
+    private static final String PREFS_KEY_API_URL = "pretix_api_url";
+    private static final String PREFS_KEY_API_KEY = "pretix_api_key";
+    private static final String PREFS_KEY_SHOW_INFO = "show_info";
+    private static final String PREFS_KEY_ALLOW_SEARCH = "allow_search";
+    private static final String PREFS_KEY_API_VERSION = "pretix_api_version";
+    private static final String PREFS_KEY_FLASHLIGHT = "flashlight";
+    private static final String PREFS_KEY_AUTOFOCUS = "autofocus";
+    private static final String PREFS_KEY_CAMERA = "camera";
+    private static final String PREFS_KEY_ASYNC_MODE = "async";
+    private static final String PREFS_PLAY_AUDIO = "playaudio";
+    private static final String PREFS_KEY_LAST_SYNC = "last_sync";
+    private static final String PREFS_KEY_LAST_FAILED_SYNC = "last_failed_sync";
+    private static final String PREFS_KEY_LAST_FAILED_SYNC_MSG = "last_failed_sync_msg";
+    private static final String PREFS_KEY_LAST_DOWNLOAD = "last_download";
+    private static final String PREFS_KEY_LAST_STATUS_DATA = "last_status_data";
+
+    private static final String PREFS_KEY_BLE_PRINTING = "ble_printing";
+    private static final String PREFS_KEY_BLE_ADDRESS = "ble_address";
+    private static final String PREFS_KEY_BLE_CONNECTED = "ble_connected";
+
     private SharedPreferences prefs;
     private SharedPreferences default_prefs;
 
@@ -115,14 +119,17 @@ public class AppConfig implements ConfigStore {
         prefs.edit().putBoolean(PREFS_KEY_FLASHLIGHT, val).apply();
     }
 
+    @SuppressWarnings("unused")
     public void setAutofocus(boolean val) {
         prefs.edit().putBoolean(PREFS_KEY_AUTOFOCUS, val).apply();
     }
 
+    @SuppressWarnings("unused")
     public void setSoundEnabled(boolean val) {
         default_prefs.edit().putBoolean(PREFS_PLAY_AUDIO, val).apply();
     }
 
+    @SuppressWarnings("unused")
     public void setCamera(boolean val) {
         default_prefs.edit().putBoolean(PREFS_KEY_CAMERA, val).apply();
     }
@@ -178,5 +185,29 @@ public class AppConfig implements ConfigStore {
 
     public void setLastFailedSyncMsg(String val) {
         prefs.edit().putString(PREFS_KEY_LAST_FAILED_SYNC_MSG, val).apply();
+    }
+
+    public boolean getBlePrintingEnabled() {
+        return prefs.getBoolean(PREFS_KEY_BLE_PRINTING, false);
+    }
+
+    public void setBlePrintingEnabled(Boolean val) {
+        prefs.edit().putBoolean(PREFS_KEY_BLE_PRINTING, val).apply();
+    }
+
+    public Boolean getBleConnected() {
+        return prefs.getBoolean(PREFS_KEY_BLE_CONNECTED, false);
+    }
+
+    public void setBleConnected(Boolean val) {
+        prefs.edit().putBoolean(PREFS_KEY_BLE_CONNECTED, val).apply();
+    }
+
+    public String getBlePrinterAddress() {
+        return prefs.getString(PREFS_KEY_BLE_ADDRESS, "");
+    }
+
+    public void setBlePrinterAddress(String val) {
+        prefs.edit().putString(PREFS_KEY_BLE_ADDRESS, val).apply();
     }
 }

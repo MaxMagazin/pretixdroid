@@ -7,14 +7,17 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothGattCharacteristic
+import android.content.*
 import android.content.pm.PackageManager
-import android.content.res.AssetFileDescriptor
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.preference.PreferenceManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -23,12 +26,13 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import buildUartPrinterString
 
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
@@ -49,6 +53,7 @@ import eu.pretix.libpretixsync.check.TicketCheckProvider
 import eu.pretix.libpretixsync.db.OrderPosition
 import eu.pretix.libpretixsync.db.QueuedCheckIn
 import eu.pretix.pretixdroid.AppConfig
+import eu.pretix.pretixdroid.BluetoothLeService
 import eu.pretix.pretixdroid.BuildConfig
 import eu.pretix.pretixdroid.PretixDroid
 import eu.pretix.pretixdroid.R
@@ -56,7 +61,6 @@ import eu.pretix.pretixdroid.async.SyncService
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 
 class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaPlayer.OnCompletionListener {
-
     private var qrView: CustomizedScannerView? = null
     private var lastScanTime: Long = 0
     private var lastScanCode: String? = null
@@ -66,11 +70,79 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
     private var blinkDark = true
     private var blinkHandler: Handler? = null
     private var mediaPlayer: MediaPlayer? = null
-    private var checkProvider: TicketCheckProvider? = null
     private var config: AppConfig? = null
     private var timer: Timer? = null
     private var questionsDialog: Dialog? = null
     private var unpaidDialog: Dialog? = null
+//    private var mqttManager: MqttManager? = null
+
+    private val TAG = MainActivity::class.java.simpleName
+    private var mDeviceName: String? = null
+    private var mDeviceAddress: String? = null
+
+    private val mServiceConnection = object : ServiceConnection {
+
+        override fun onServiceConnected(componentName: ComponentName, service: IBinder) {
+            mBluetoothLeService = (service as BluetoothLeService.LocalBinder).service
+            Log.i(TAG, "BLE Service connected")
+            if (!mBluetoothLeService!!.initialize()) {
+                Log.e(TAG, "Unable to initialize Bluetooth")
+                finish()
+            }
+            // Automatically connects to the device upon successful start-up initialization.
+            connectGatt()
+        }
+
+        override fun onServiceDisconnected(componentName: ComponentName) {
+            Log.i(TAG, "BLE Service disconnected")
+            mBluetoothLeService = null
+        }
+    }
+
+    // Handles various events fired by the Service.
+    // ACTION_GATT_CONNECTED: connected to a GATT server.
+    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
+    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
+    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
+    //                        or notification operations.
+    private val mGattUpdateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val action = intent.action
+            when (action) {
+                BluetoothLeService.ACTION_GATT_CONNECTED -> {
+                    Log.i(TAG, "ACTION_GATT_CONNECTED")
+                    config!!.bleConnected = true
+                    invalidateOptionsMenu()
+                }
+
+                BluetoothLeService.ACTION_GATT_DISCONNECTED -> {
+                    Log.i(TAG, "ACTION_GATT_DISCONNECTED")
+                    config!!.bleConnected = false
+                    invalidateOptionsMenu()
+
+                    connectGatt()
+                }
+
+                BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED -> {
+                    Log.i(TAG, "ACTION_GATT_SERVICES_DISCOVERED")
+                    // Initialize onClickListener for the Send-Button
+/*                    if (mBluetoothLeService != null) {
+                        blePrinterReady = true
+                    }*/
+                }
+
+                BluetoothLeService.ACTION_DATA_AVAILABLE -> {
+                    Log.i(TAG, "ACTION_GATT_DATA_AVAILABLE")
+                }
+
+                BluetoothLeService.ACTION_DATA_SENT -> {
+                    Log.i(TAG, "ACTION_GATT_DATA_SENT")
+                }
+
+            }
+        }
+    }
+
 
     private val scanReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -92,6 +164,24 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
         SCANNING, LOADING, RESULT
     }
 
+    private fun connectGatt() {
+        if (config!!.blePrintingEnabled) {
+            if (BluetoothAdapter.checkBluetoothAddress(mDeviceAddress)) {
+                val result = mBluetoothLeService!!.connect(mDeviceAddress)
+                Log.d(TAG, "GATT Connect request result=$result")
+                if (!result) {
+                    Toast.makeText(this,
+                            "Connect attempt failed!",
+                            Toast.LENGTH_LONG).show()
+                }
+            } else {
+                Log.d(TAG, "GATT Connect request: \"${mDeviceAddress}\" is not a valid Bluetooth Address!")
+            }
+        } else {
+            Log.d(TAG, "GATT Connect request: BLE Printing disabled by config!")
+        }
+    }
+
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -103,6 +193,27 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
 
         checkProvider = (application as PretixDroid).newCheckProvider
         config = AppConfig(this)
+
+        val intent = intent
+        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME)
+        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS)
+
+        if (mDeviceAddress == null || mDeviceAddress == "" || mDeviceAddress == "DEVICE_ADDRESS") {
+            Log.w(TAG, "Device address empty - setting from preferences!")
+            mDeviceAddress = config!!.blePrinterAddress
+        }
+
+        val gattServiceIntent = Intent(this, BluetoothLeService::class.java)
+        bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE)
+        Log.d(TAG, "BLE bindService(): mServiceConnection")
+
+
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter())
+        if (mBluetoothLeService != null) {
+            connectGatt()
+        } else {
+            Log.d(TAG, "GATT Connect request: mBluetoothLeService == null")
+        }
 
         setContentView(R.layout.activity_main)
 
@@ -157,14 +268,12 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
     }
 
     private inner class SyncTriggerTask : TimerTask() {
-
         override fun run() {
             triggerSync()
         }
     }
 
     private inner class UpdateSyncStatusTask : TimerTask() {
-
         override fun run() {
             runOnUiThread { updateSyncStatus() }
         }
@@ -185,6 +294,19 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
             registerReceiver(scanReceiver, filter)
         }
 
+//        mqttManager!!.reconnect()
+
+        if (config!!.blePrintingEnabled) {
+            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter())
+            if (mBluetoothLeService != null) {
+                connectGatt()
+                //            val result = mBluetoothLeService!!.connect(mDeviceAddress)
+                //            Log.d(TAG, "GATT Connect request result=$result")
+            } else {
+                Log.d(TAG, "GATT Connect request: mBluetoothLeService == null")
+            }
+        }
+
         timer = Timer()
         timer!!.schedule(SyncTriggerTask(), 1000, 10000)
         timer!!.schedule(UpdateSyncStatusTask(), 500, 500)
@@ -199,6 +321,14 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
             unregisterReceiver(scanReceiver)
         }
         timer!!.cancel()
+
+        unregisterReceiver(mGattUpdateReceiver)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unbindService(mServiceConnection)
+        mBluetoothLeService = null
     }
 
     override fun handleResult(rawResult: Result) {
@@ -252,6 +382,7 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
                 config!!.setEventConfig(jsonObject.getString("apiurl"), jsonObject.getString("apikey"), //FIXME: Update for Silpion Event config
                         jsonObject.getInt("version"), jsonObject.optBoolean("show_info", true),
                         jsonObject.optBoolean("allow_search", true))
+
                 checkProvider = (application as PretixDroid).newCheckProvider
                 displayScanResult(TicketCheckProvider.CheckResult(
                         TicketCheckProvider.CheckResult.Type.VALID,
@@ -391,6 +522,37 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
         }
     }
 
+    private fun printBadge(checkResult: TicketCheckProvider.CheckResult) {
+        if (checkResult.attendee_name != null && checkResult.attendee_name != "null") {
+//            val sat = if (checkResult.isRequireAttention) "Special Attention Ticket" else " " // FIXME: printer still requires whitespace
+
+            if (!config!!.blePrintingEnabled) {
+                Log.d(TAG, "BLE Printing disabled")
+                Toast.makeText(this,
+                        R.string.printing_disabled,
+                        Toast.LENGTH_SHORT).show()
+            } else if (!config!!.bleConnected || mBluetoothLeService == null) {
+                Log.d(TAG, "Printer disconnected")
+                Toast.makeText(this,
+                        R.string.printer_disconnected,
+                        Toast.LENGTH_SHORT).show()
+            } else if (mBluetoothLeService!!.uartTxCharacteristic == null) {
+                Log.d(TAG, "Printer connection error")
+                Toast.makeText(this,
+                        R.string.printer_connection_error,
+                        Toast.LENGTH_SHORT).show()
+            } else {
+                // All clear, print away!
+                mBluetoothLeService!!.writeUartData(
+                        mBluetoothLeService!!.uartTxCharacteristic as BluetoothGattCharacteristic,
+                        buildUartPrinterString(checkResult.attendee_name, checkResult.isRequireAttention, checkResult.orderCode))
+//                mqttManager?.publish(checkResult.getAttendee_name() + ";" + sat + ";" + checkResult.getOrderCode());
+            }
+        } else {
+            Log.d("Badge", "Nothing to print")
+        }
+    }
+
     private fun displayScanResult(checkResult: TicketCheckProvider.CheckResult, answers: List<TicketCheckProvider.Answer>?, ignore_unpaid: Boolean) {
         if (checkResult.type == TicketCheckProvider.CheckResult.Type.ANSWERS_REQUIRED) {
             questionsDialog = QuestionDialogHelper.showDialog(this, checkResult, lastScanCode, { secret, answers, ignore_unpaid -> handleTicketScanned(secret, answers, ignore_unpaid) }, ignore_unpaid)
@@ -403,6 +565,9 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
         val tvTicketName = findViewById<View>(R.id.tvTicketName) as TextView
         val tvAttendeeName = findViewById<View>(R.id.tvAttendeeName) as TextView
         val tvOrderCode = findViewById<View>(R.id.tvOrderCode) as TextView
+
+//        val tvPrintBadge = findViewById<View>(R.id.tvPrintBadge) as Button
+//        tvPrintBadge.setOnClickListener { printBadge(checkResult) }
 
         state = State.RESULT
         findViewById<View>(R.id.pbScan).visibility = View.INVISIBLE
@@ -420,6 +585,7 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
         if (checkResult.attendee_name != null && checkResult.attendee_name != "null") {
             tvAttendeeName.visibility = View.VISIBLE
             tvAttendeeName.text = checkResult.attendee_name
+//            tvPrintBadge.visibility = View.VISIBLE
         }
 
         if (checkResult.orderCode != null && checkResult.orderCode != "null") {
@@ -458,6 +624,7 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
             TicketCheckProvider.CheckResult.Type.VALID -> {
                 col = R.color.scan_result_ok
                 default_string = R.string.scan_result_valid
+                printBadge(checkResult)
             }
         }
 
@@ -529,7 +696,15 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
 
         val checkable = menu.findItem(R.id.action_flashlight)
         checkable.isChecked = config!!.flashlight
-
+/*
+        if (config!!.bleConnected) {
+            menu.findItem(R.id.menu_connected).isVisible = true
+            menu.findItem(R.id.menu_disconnected).isVisible = false
+        } else {
+            menu.findItem(R.id.menu_connected).isVisible = false
+            menu.findItem(R.id.menu_disconnected).isVisible = true
+        }
+*/
         return true
     }
 
@@ -543,6 +718,29 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
                 item.isChecked = !item.isChecked
                 return true
             }
+/*            R.id.menu_print_test_ticket -> {
+                mBluetoothLeService!!.writeUartData(
+                        mBluetoothLeService!!.uartTxCharacteristic as BluetoothGattCharacteristic,
+                        buildUartPrinterString("Klaus-Bärbel Günther von Irgendwas-Doppelname genannt Jemand Anders", "SPECIÄL ÄTTÜNTIÖN", "Örder Cöde"))
+                return true
+            }*/
+/*            R.id.menu_connect -> {
+
+//                mBluetoothLeService!!.connect(mDeviceAddress)
+                connectGatt()
+                return true
+            }
+            R.id.menu_disconnect -> {
+
+                manuallyDisconnected = true
+                mBluetoothLeService!!.disconnect()
+                return true
+            }*/
+/*            R.id.action_blescan -> {
+                val intent_blescan = Intent(this, BleScanActivity::class.java)
+                startActivity(intent_blescan)
+                return true
+            }*/
             R.id.action_preferences -> {
                 val intent_settings = Intent(this, SettingsActivity::class.java)
                 startActivity(intent_settings)
@@ -572,6 +770,21 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
 
     companion object {
 
+        var mBluetoothLeService: BluetoothLeService? = null
+        var checkProvider: TicketCheckProvider? = null
+
         val PERMISSIONS_REQUEST_CAMERA = 10001
+        val EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS"
+        val EXTRAS_DEVICE_NAME = "DEVICE_NAME"
+
+        private fun makeGattUpdateIntentFilter(): IntentFilter {
+            val intentFilter = IntentFilter()
+            intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED)
+            intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED)
+            intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED)
+            intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE)
+            intentFilter.addAction(BluetoothLeService.ACTION_DATA_SENT)
+            return intentFilter
+        }
     }
 }

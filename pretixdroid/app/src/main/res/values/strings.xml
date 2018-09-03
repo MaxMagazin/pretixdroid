@@ -43,6 +43,7 @@
     <string name="pref_head_scan">Scanning</string>
     <string name="pref_head_connection">Connection</string>
     <string name="pref_head_other">Other</string>
+    <string name="pref_head_printing">Printing</string>
     <string name="reset_success">You can now scan a new configuration code</string>
     <string name="action_preferences">Settings</string>
     <string name="pref_camera">Use device camera</string>
@@ -53,7 +54,8 @@
     <string name="pref_async_hint_off">Scanned tickets are checked directly with the server. The app requires an internet connection to work.</string>
     <string name="pref_async_not_supported">Asynchronous scanning is not supported by the version of pretix running on your server. Please check for updates of pretix.</string>
     <string name="pref_async_warning">If you turn on asynchronous scanning, your phone will not be always up to date about the current database state. For example, if you use more than one device for scanning, a ticket might be shown as valid twice if it has already been scanned by a different device before.</string>
-    <string name="pref_reset_warning">Your app is not fully synchronized. If you reset it now, some scans made on this device might get permanently lost.</string>
+    <string name="pref_reset_warning">Really reset the app?</string>
+    <string name="pref_reset_sync_warning">Your app is not fully synchronized. If you reset it now, some scans made on this device might get permanently lost.</string>
     <plurals name="time_minutes">
         <item quantity="one">%d minute</item>
         <item quantity="other">%d minutes</item>
@@ -80,4 +82,20 @@
     <string name="dialog_unpaid_title">Unpaid order</string>
     <string name="dialog_unpaid_text">This ticket belongs to an order that has not yet been paid. Do you still want to check it in? This will not mark the order as paid.</string>
     <string name="dialog_unpaid_retry">Check in anyways</string>
+    <string name="action_print_badge">Print Badge</string>
+    <string name="action_blescan">Scan BLE Printers</string>
+    <string name="ble_scan">Scan</string>
+    <string name="menu_disconnect">Disconnect BLE Device</string>
+    <string name="menu_connect">Connect BLE Device</string>
+    <string name="menu_print_test_ticket">Print Test Ticket</string>
+    <string name="pref_printer_enable">Enable BLE Printing</string>
+    <string name="pref_printer_print_immediately">Print badge immediately</string>
+    <string name="print_test_badge">Print test badge</string>
+    <string name="scan_timeout">Scan Timeout</string>
+    <string name="no_devices_found">No BLE printing devices found</string>
+    <string name="printing_disabled">Printing disabled by configuration</string>
+    <string name="printer_disconnected">Printer disconnected</string>
+    <string name="printer_connection_error">Printer connection error</string>
+    <string name="menu_connected">BLE Connected</string>
+    <string name="menu_disconnected">BLE Disconnected</string>
 </resources>
