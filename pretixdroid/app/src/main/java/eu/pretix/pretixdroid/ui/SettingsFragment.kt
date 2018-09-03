@@ -138,36 +138,36 @@ class SettingsFragment : PreferenceFragment() {
         val print_test_badge = findPreference("action_print_test_badge")
         if (checkProvider != null && mBluetoothLeService != null) {
             val config = AppConfig(activity)
-            val testData = checkProvider!!.testTicket
-            print_test_badge.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                if (!config!!.blePrintingEnabled) {
-                    Log.d(TAG, "BLE Printing disabled")
-                    Toast.makeText(activity,
-                            R.string.printing_disabled,
-                            Toast.LENGTH_LONG).show()
-                    return@OnPreferenceClickListener false
-                } else if (!config!!.bleConnected || mBluetoothLeService == null) {
-                    Log.d(TAG, "Printer disconnected")
-                    Toast.makeText(activity,
-                            R.string.printer_disconnected,
-                            Toast.LENGTH_LONG).show()
-                    return@OnPreferenceClickListener false
-                } else if (mBluetoothLeService!!.uartTxCharacteristic == null) {
-                    Log.d(TAG, "Printer connection error")
-                    Toast.makeText(activity,
-                            R.string.printer_connection_error,
-                            Toast.LENGTH_LONG).show()
-                    return@OnPreferenceClickListener false
-                } else {
-                    mBluetoothLeService!!.writeUartData(
-                            mBluetoothLeService!!.uartTxCharacteristic as BluetoothGattCharacteristic,
-                            buildUartPrinterString(testData[0], false, testData[1]))
-//                        buildUartPrinterString(testData[0], false, "H7EFWW3CW9"))
-//                buildUartPrinterString("Klaus-Bärbel Günther von Irgendwas-Doppelname genannt Jemand Anders", false, "1234567890"))
-//                buildUartPrinterString("Max Mustermann", false, "1234567890"))
-                    return@OnPreferenceClickListener true
-                }
-            }
+//            val testData = checkProvider!!.testTicket //FIXME: Alex and Maxim: testTicket in libpretixsync
+//            print_test_badge.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+//                if (!config!!.blePrintingEnabled) {
+//                    Log.d(TAG, "BLE Printing disabled")
+//                    Toast.makeText(activity,
+//                            R.string.printing_disabled,
+//                            Toast.LENGTH_LONG).show()
+//                    return@OnPreferenceClickListener false
+//                } else if (!config!!.bleConnected || mBluetoothLeService == null) {
+//                    Log.d(TAG, "Printer disconnected")
+//                    Toast.makeText(activity,
+//                            R.string.printer_disconnected,
+//                            Toast.LENGTH_LONG).show()
+//                    return@OnPreferenceClickListener false
+//                } else if (mBluetoothLeService!!.uartTxCharacteristic == null) {
+//                    Log.d(TAG, "Printer connection error")
+//                    Toast.makeText(activity,
+//                            R.string.printer_connection_error,
+//                            Toast.LENGTH_LONG).show()
+//                    return@OnPreferenceClickListener false
+//                } else {
+//                    mBluetoothLeService!!.writeUartData(
+//                            mBluetoothLeService!!.uartTxCharacteristic as BluetoothGattCharacteristic,
+//                            buildUartPrinterString(testData[0], false, testData[1]))
+////                        buildUartPrinterString(testData[0], false, "H7EFWW3CW9"))
+////                buildUartPrinterString("Klaus-Bärbel Günther von Irgendwas-Doppelname genannt Jemand Anders", false, "1234567890"))
+////                buildUartPrinterString("Max Mustermann", false, "1234567890"))
+//                    return@OnPreferenceClickListener true
+//                }
+//            }
         }
 
     }
