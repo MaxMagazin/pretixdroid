@@ -188,7 +188,7 @@ public class AppConfig implements ConfigStore {
     }
 
     public boolean getBlePrintingEnabled() {
-        return prefs.getBoolean(PREFS_KEY_BLE_PRINTING, false);
+        return prefs.getBoolean(PREFS_KEY_BLE_PRINTING, true);
     }
 
     public void setBlePrintingEnabled(Boolean val) {

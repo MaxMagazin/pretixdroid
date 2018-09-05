@@ -1,3 +1,5 @@
+package eu.pretix.pretixdroid
+
 import android.util.Log
 
 val printHelper = PrintHelper()
@@ -29,12 +31,12 @@ fun splitLongLines(longLine: String): Array<String> {
                 when {
                     (((length + lineSegments[i].length) <= maxPrintLineLength) and
                             ((length + lineSegments[i].length + lineSegments[i+1].length) > maxPrintLineLength)) -> {
-                        Log.d("splitLongLines", "length + segment length <= maxPrintLineLength and length + segment length + next segment length > maxPrintLineLength")
+                        Log.d("splitLongLines", "length + segment length <= eu.pretix.pretixdroid.maxPrintLineLength and length + segment length + next segment length > eu.pretix.pretixdroid.maxPrintLineLength")
                         append = true
                     }
 
                     ((length + lineSegments[i].length) > maxPrintLineLength) -> {
-                        Log.d("splitLongLines", "length + segment length > maxPrintLineLength")
+                        Log.d("splitLongLines", "length + segment length > eu.pretix.pretixdroid.maxPrintLineLength")
                     }
                     else -> {
                         Log.d("splitLongLines", "appending whitespace")
