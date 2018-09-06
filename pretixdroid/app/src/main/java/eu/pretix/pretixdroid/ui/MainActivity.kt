@@ -538,7 +538,7 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
                 // All clear, print away!
                 mBluetoothLeService!!.writeUartData(
                         mBluetoothLeService!!.uartTxCharacteristic as BluetoothGattCharacteristic,
-                        buildUartPrinterString(checkResult.attendee_name, checkResult.isRequireAttention, checkResult.orderCode))
+                        buildUartPrinterString(checkResult))
 //                mqttManager?.publish(checkResult.getAttendee_name() + ";" + sat + ";" + checkResult.getOrderCode());
             }
         } else {
@@ -613,6 +613,7 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
             TicketCheckProvider.CheckResult.Type.USED -> {
                 col = R.color.scan_result_warn
                 default_string = R.string.scan_result_used
+                printBadge(checkResult)
             }
             TicketCheckProvider.CheckResult.Type.VALID -> {
                 col = R.color.scan_result_ok

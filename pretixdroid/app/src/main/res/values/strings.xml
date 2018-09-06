@@ -98,4 +98,6 @@
     <string name="printer_connection_error">Printer connection error</string>
     <string name="menu_connected">BLE Connected</string>
     <string name="menu_disconnected">BLE Disconnected</string>
+    <string name="pref_speaker_question">Is this a Speaker Badge?</string>
+    <string name="no">No</string>
 </resources>

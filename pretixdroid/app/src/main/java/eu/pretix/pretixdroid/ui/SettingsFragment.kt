@@ -137,7 +137,6 @@ class SettingsFragment : PreferenceFragment() {
         val print_test_badge = findPreference("action_print_test_badge")
         if (checkProvider != null && mBluetoothLeService != null) {
             val config = AppConfig(activity)
-            val testData = checkProvider!!.testTicket //FIXME: Alex and Maxim: testTicket in libpretixsync
             print_test_badge.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 if (!config!!.blePrintingEnabled) {
                     Log.d(TAG, "BLE Printing disabled")
@@ -158,9 +157,19 @@ class SettingsFragment : PreferenceFragment() {
                             Toast.LENGTH_LONG).show()
                     return@OnPreferenceClickListener false
                 } else {
-                    mBluetoothLeService!!.writeUartData(
-                            mBluetoothLeService!!.uartTxCharacteristic as BluetoothGattCharacteristic,
-                            eu.pretix.pretixdroid.buildUartPrinterString(testData[0], false, testData[1]))
+                    AlertDialog.Builder(activity)
+                            .setMessage(R.string.pref_speaker_question)
+                            .setNegativeButton(getString(R.string.no)) { dialog, whichButton ->
+                                mBluetoothLeService!!.writeUartData(
+                                        mBluetoothLeService!!.uartTxCharacteristic as BluetoothGattCharacteristic,
+                                        eu.pretix.pretixdroid.makeTestBadge(false))
+                            }
+                            .setPositiveButton(getString(R.string.yes)) { dialog, whichButton ->
+                                mBluetoothLeService!!.writeUartData(
+                                        mBluetoothLeService!!.uartTxCharacteristic as BluetoothGattCharacteristic,
+                                        eu.pretix.pretixdroid.makeTestBadge(true))
+                            }.create().show()
+
                     return@OnPreferenceClickListener true
                 }
             }
