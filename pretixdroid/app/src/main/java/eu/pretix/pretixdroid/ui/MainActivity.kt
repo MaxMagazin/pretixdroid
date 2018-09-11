@@ -25,6 +25,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -474,6 +475,7 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
         findViewById<View>(R.id.tvTicketName).visibility = View.INVISIBLE
         findViewById<View>(R.id.tvAttendeeName).visibility = View.INVISIBLE
         findViewById<View>(R.id.tvOrderCode).visibility = View.INVISIBLE
+        findViewById<View>(R.id.tvPrintBadge).visibility = View.INVISIBLE
         (findViewById<View>(R.id.tvTicketName) as TextView).text = ""
         (findViewById<View>(R.id.tvScanResult) as TextView).text = ""
         (findViewById<View>(R.id.tvAttendeeName) as TextView).text = ""
@@ -559,8 +561,8 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
         val tvAttendeeName = findViewById<View>(R.id.tvAttendeeName) as TextView
         val tvOrderCode = findViewById<View>(R.id.tvOrderCode) as TextView
 
-//        val tvPrintBadge = findViewById<View>(R.id.tvPrintBadge) as Button
-//        tvPrintBadge.setOnClickListener { printBadge(checkResult) }
+        val tvPrintBadge = findViewById<View>(R.id.tvPrintBadge) as Button
+        tvPrintBadge.setOnClickListener { printBadge(checkResult) }
 
         state = State.RESULT
         findViewById<View>(R.id.pbScan).visibility = View.INVISIBLE
@@ -613,7 +615,7 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
             TicketCheckProvider.CheckResult.Type.USED -> {
                 col = R.color.scan_result_warn
                 default_string = R.string.scan_result_used
-                printBadge(checkResult)
+                tvPrintBadge.visibility = View.VISIBLE
             }
             TicketCheckProvider.CheckResult.Type.VALID -> {
                 col = R.color.scan_result_ok
