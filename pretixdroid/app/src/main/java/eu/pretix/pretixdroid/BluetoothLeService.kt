@@ -223,6 +223,7 @@ class BluetoothLeService : Service() {
                 mConnectionState = STATE_CONNECTING
                 return true
             } else {
+                Log.e(TAG, "Connection attempt failed!")
                 return false
             }
         }

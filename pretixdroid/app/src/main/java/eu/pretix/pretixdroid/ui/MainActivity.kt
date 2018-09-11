@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.bluetooth.BluetoothAdapter
@@ -13,7 +12,6 @@ import android.content.*
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
@@ -24,15 +22,13 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import buildUartPrinterString
+import eu.pretix.pretixdroid.buildUartPrinterString
 
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
@@ -50,7 +46,6 @@ import java.util.TimerTask
 
 import eu.pretix.libpretixsync.api.PretixApi
 import eu.pretix.libpretixsync.check.TicketCheckProvider
-import eu.pretix.libpretixsync.db.OrderPosition
 import eu.pretix.libpretixsync.db.QueuedCheckIn
 import eu.pretix.pretixdroid.AppConfig
 import eu.pretix.pretixdroid.BluetoothLeService
@@ -296,12 +291,10 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
 
 //        mqttManager!!.reconnect()
 
+        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter())
         if (config!!.blePrintingEnabled) {
-            registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter())
             if (mBluetoothLeService != null) {
                 connectGatt()
-                //            val result = mBluetoothLeService!!.connect(mDeviceAddress)
-                //            Log.d(TAG, "GATT Connect request result=$result")
             } else {
                 Log.d(TAG, "GATT Connect request: mBluetoothLeService == null")
             }
@@ -545,7 +538,7 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
                 // All clear, print away!
                 mBluetoothLeService!!.writeUartData(
                         mBluetoothLeService!!.uartTxCharacteristic as BluetoothGattCharacteristic,
-                        buildUartPrinterString(checkResult.attendee_name, checkResult.isRequireAttention, checkResult.orderCode))
+                        buildUartPrinterString(checkResult))
 //                mqttManager?.publish(checkResult.getAttendee_name() + ";" + sat + ";" + checkResult.getOrderCode());
             }
         } else {
@@ -620,6 +613,7 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
             TicketCheckProvider.CheckResult.Type.USED -> {
                 col = R.color.scan_result_warn
                 default_string = R.string.scan_result_used
+                printBadge(checkResult)
             }
             TicketCheckProvider.CheckResult.Type.VALID -> {
                 col = R.color.scan_result_ok
@@ -721,7 +715,7 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
 /*            R.id.menu_print_test_ticket -> {
                 mBluetoothLeService!!.writeUartData(
                         mBluetoothLeService!!.uartTxCharacteristic as BluetoothGattCharacteristic,
-                        buildUartPrinterString("Klaus-Bärbel Günther von Irgendwas-Doppelname genannt Jemand Anders", "SPECIÄL ÄTTÜNTIÖN", "Örder Cöde"))
+                        eu.pretix.pretixdroid.buildUartPrinterString("Klaus-Bärbel Günther von Irgendwas-Doppelname genannt Jemand Anders", "SPECIÄL ÄTTÜNTIÖN", "Örder Cöde"))
                 return true
             }*/
 /*            R.id.menu_connect -> {

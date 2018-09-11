@@ -1,4 +1,8 @@
+package eu.pretix.pretixdroid
+
 import android.util.Log
+import eu.pretix.libpretixsync.check.TicketCheckProvider
+import eu.pretix.pretixdroid.ui.MainActivity.Companion.checkProvider
 
 val printHelper = PrintHelper()
 
@@ -29,12 +33,12 @@ fun splitLongLines(longLine: String): Array<String> {
                 when {
                     (((length + lineSegments[i].length) <= maxPrintLineLength) and
                             ((length + lineSegments[i].length + lineSegments[i+1].length) > maxPrintLineLength)) -> {
-                        Log.d("splitLongLines", "length + segment length <= maxPrintLineLength and length + segment length + next segment length > maxPrintLineLength")
+                        Log.d("splitLongLines", "length + segment length <= eu.pretix.pretixdroid.maxPrintLineLength and length + segment length + next segment length > eu.pretix.pretixdroid.maxPrintLineLength")
                         append = true
                     }
 
                     ((length + lineSegments[i].length) > maxPrintLineLength) -> {
-                        Log.d("splitLongLines", "length + segment length > maxPrintLineLength")
+                        Log.d("splitLongLines", "length + segment length > eu.pretix.pretixdroid.maxPrintLineLength")
                     }
                     else -> {
                         Log.d("splitLongLines", "appending whitespace")
@@ -91,9 +95,12 @@ fun buildBarcode(data: String, yPos: Int) : String {
     return bcString
 }
 
-fun lookupCompany(orderCode: String) : String {
-    // FIXME: This needs to be fetched from the database
-    return "ACME Inc."
+fun makeTestBadge(sat: Boolean) : String {
+
+    val name = checkProvider!!.longestName
+    val company = "Foobar Inc."
+    val orderCode = "12345678"
+    return buildUartPrinterString(name, orderCode, company, sat)
 }
 
 /**
@@ -104,10 +111,19 @@ fun lookupCompany(orderCode: String) : String {
  * in the function that actually sends the data over the air.
  */
 
-fun buildUartPrinterString(name:String, sat:Boolean, orderCode:String) : String {
+fun buildUartPrinterString(cr: TicketCheckProvider.CheckResult) : String {
+    val name = cr.attendee_name
+    val orderCode = cr.orderCode
+    val company = cr.company_name
+    val sat = cr.isRequireAttention
+
+    return buildUartPrinterString(name, orderCode, company, sat)
+}
+
+fun buildUartPrinterString(name: String, orderCode: String, company: String, sat: Boolean) : String {
 
     // Build a map from the strings to iterate through
-    val strings = mapOf(Pair("name", name), Pair("orderCode", lookupCompany(orderCode)))
+    val strings = mapOf(Pair("name", name), Pair("company", company))
 
     // Printer setup commands
     val prnInitCmd        = "@\r\n"    // Set speed to 5 ips
