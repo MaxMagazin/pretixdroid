@@ -194,7 +194,7 @@ class SettingsFragment : PreferenceFragment() {
         try {
             fis = resources.openRawResource(htmlRes)
             val reader = BufferedReader(InputStreamReader(fis, "utf-8"))
-            var line: String
+            var line: String?
             line = reader.readLine()
             while (line != null) {
                 builder.append(line)
