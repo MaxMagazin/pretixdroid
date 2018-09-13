@@ -1,4 +1,4 @@
-package eu.pretix.pretixdroid.ui;
+package eu.pretix.pretixdroidble.ui;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +8,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 
 import eu.pretix.libpretixsync.check.TicketCheckProvider;
-import eu.pretix.pretixdroid.R;
+import eu.pretix.pretixdroidble.R;
 
 /**
  * is the handler of a card that displays information about each item of an event

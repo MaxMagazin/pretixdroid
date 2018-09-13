@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="eu.pretix.pretixdroid.ui.BleScanActivity">
+    tools:context="eu.pretix.pretixdroidble.ui.BleScanActivity">
 
     <Button
         android:id="@+id/scan"

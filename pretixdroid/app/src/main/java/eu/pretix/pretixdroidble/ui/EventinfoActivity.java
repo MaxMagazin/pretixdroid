@@ -1,4 +1,4 @@
-package eu.pretix.pretixdroid.ui;
+package eu.pretix.pretixdroidble.ui;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -20,9 +20,9 @@ import java.util.List;
 
 import eu.pretix.libpretixsync.check.CheckException;
 import eu.pretix.libpretixsync.check.TicketCheckProvider;
-import eu.pretix.pretixdroid.AppConfig;
-import eu.pretix.pretixdroid.PretixDroid;
-import eu.pretix.pretixdroid.R;
+import eu.pretix.pretixdroidble.AppConfig;
+import eu.pretix.pretixdroidble.PretixDroid;
+import eu.pretix.pretixdroidble.R;
 
 /**
  * This class is the activity for the Eventinfo page to let the user see statistics about their

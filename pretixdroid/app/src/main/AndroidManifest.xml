@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="eu.pretix.pretixdroid">
+    package="eu.pretix.pretixdroidble">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -20,7 +20,7 @@
     <application
         android:name=".PretixDroid"
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/pretix_launcher"
         android:label="@string/app_name"
         android:logo="@drawable/ic_logo"
         android:theme="@style/AppTheme">
@@ -48,7 +48,7 @@
             android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="eu.pretix.pretixdroid.ui.MainActivity" />
+                android:value="eu.pretix.pretixdroidble.ui.MainActivity" />
         </activity>
 
         <activity
@@ -57,7 +57,7 @@
             android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="eu.pretix.pretixdroid.ui.MainActivity" />
+                android:value="eu.pretix.pretixdroidble.ui.MainActivity" />
         </activity>
 
         <activity
@@ -70,7 +70,7 @@
             </intent-filter>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="eu.pretix.pretixdroid.ui.MainActivity" />
+                android:value="eu.pretix.pretixdroidble.ui.MainActivity" />
         </activity>
 
         <service

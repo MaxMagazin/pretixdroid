@@ -1,4 +1,4 @@
-package eu.pretix.pretixdroid.ui
+package eu.pretix.pretixdroidble.ui
 
 import android.Manifest
 import android.app.Activity
@@ -20,8 +20,8 @@ import android.bluetooth.le.ScanSettings
 import android.bluetooth.le.ScanFilter
 import android.preference.PreferenceManager
 import android.widget.*
-import eu.pretix.pretixdroid.BluetoothLeService
-import eu.pretix.pretixdroid.R
+import eu.pretix.pretixdroidble.BluetoothLeService
+import eu.pretix.pretixdroidble.R
 
 
 class BleScanActivity : AppCompatActivity() {

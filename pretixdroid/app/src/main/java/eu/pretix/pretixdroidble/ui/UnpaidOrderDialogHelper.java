@@ -1,4 +1,4 @@
-package eu.pretix.pretixdroid.ui;
+package eu.pretix.pretixdroidble.ui;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -35,7 +35,7 @@ import eu.pretix.libpretixsync.check.TicketCheckProvider;
 import eu.pretix.libpretixsync.db.AbstractQuestion;
 import eu.pretix.libpretixsync.db.Question;
 import eu.pretix.libpretixsync.db.QuestionOption;
-import eu.pretix.pretixdroid.R;
+import eu.pretix.pretixdroidble.R;
 
 public class UnpaidOrderDialogHelper {
     public interface RetryHandler {

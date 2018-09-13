@@ -1,4 +1,4 @@
-package eu.pretix.pretixdroid;
+package eu.pretix.pretixdroidble;
 
 import com.joshdholtz.sentry.Sentry;
 

@@ -1,8 +1,8 @@
-package eu.pretix.pretixdroid
+package eu.pretix.pretixdroidble
 
 import android.util.Log
 import eu.pretix.libpretixsync.check.TicketCheckProvider
-import eu.pretix.pretixdroid.ui.MainActivity.Companion.checkProvider
+import eu.pretix.pretixdroidble.ui.MainActivity.Companion.checkProvider
 
 val printHelper = PrintHelper()
 
@@ -99,7 +99,7 @@ fun makeTestBadge(sat: Boolean) : String {
 
     val name = checkProvider!!.longestName
     val company = "Foobar Inc."
-    val orderCode = "12345678"
+    val orderCode = "DEADBEEF1234"
     return buildUartPrinterString(name, orderCode, company, sat)
 }
 

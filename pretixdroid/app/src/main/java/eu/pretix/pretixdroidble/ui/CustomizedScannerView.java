@@ -1,4 +1,4 @@
-package eu.pretix.pretixdroid.ui;
+package eu.pretix.pretixdroidble.ui;
 
 import android.content.Context;
 import android.graphics.Rect;

@@ -1,4 +1,4 @@
-package eu.pretix.pretixdroid.ui
+package eu.pretix.pretixdroidble.ui
 
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Intent
@@ -16,7 +16,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import eu.pretix.pretixdroid.buildUartPrinterString
+import eu.pretix.pretixdroidble.buildUartPrinterString
 
 import com.joshdholtz.sentry.Sentry
 
@@ -27,11 +27,11 @@ import java.io.InputStreamReader
 
 import eu.pretix.libpretixsync.db.QueuedCheckIn
 
-import eu.pretix.pretixdroid.AppConfig
-import eu.pretix.pretixdroid.PretixDroid
-import eu.pretix.pretixdroid.R
-import eu.pretix.pretixdroid.ui.MainActivity.Companion.checkProvider
-import eu.pretix.pretixdroid.ui.MainActivity.Companion.mBluetoothLeService
+import eu.pretix.pretixdroidble.AppConfig
+import eu.pretix.pretixdroidble.PretixDroid
+import eu.pretix.pretixdroidble.R
+import eu.pretix.pretixdroidble.ui.MainActivity.Companion.checkProvider
+import eu.pretix.pretixdroidble.ui.MainActivity.Companion.mBluetoothLeService
 
 class SettingsFragment : PreferenceFragment() {
 
@@ -162,12 +162,12 @@ class SettingsFragment : PreferenceFragment() {
                             .setNegativeButton(getString(R.string.no)) { dialog, whichButton ->
                                 mBluetoothLeService!!.writeUartData(
                                         mBluetoothLeService!!.uartTxCharacteristic as BluetoothGattCharacteristic,
-                                        eu.pretix.pretixdroid.makeTestBadge(false))
+                                        eu.pretix.pretixdroidble.makeTestBadge(false))
                             }
                             .setPositiveButton(getString(R.string.yes)) { dialog, whichButton ->
                                 mBluetoothLeService!!.writeUartData(
                                         mBluetoothLeService!!.uartTxCharacteristic as BluetoothGattCharacteristic,
-                                        eu.pretix.pretixdroid.makeTestBadge(true))
+                                        eu.pretix.pretixdroidble.makeTestBadge(true))
                             }.create().show()
 
                     return@OnPreferenceClickListener true

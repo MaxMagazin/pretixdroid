@@ -1,4 +1,4 @@
-package eu.pretix.pretixdroid.ui;
+package eu.pretix.pretixdroidble.ui;
 
 
 import android.content.Context;
@@ -13,7 +13,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import eu.pretix.libpretixsync.check.TicketCheckProvider;
-import eu.pretix.pretixdroid.R;
+import eu.pretix.pretixdroidble.R;
 
 public class SearchResultAdapter extends ArrayAdapter<TicketCheckProvider.SearchResult> {
 

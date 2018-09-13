@@ -66,12 +66,12 @@
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>
 
-    <eu.pretix.pretixdroid.ui.CustomizedScannerView
+    <eu.pretix.pretixdroidble.ui.CustomizedScannerView
         android:id="@+id/qrdecoderview"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:layout_below="@id/rlScanStatus">
-    </eu.pretix.pretixdroid.ui.CustomizedScannerView>
+    </eu.pretix.pretixdroidble.ui.CustomizedScannerView>
 
     <RelativeLayout
         android:id="@+id/rlWarning"

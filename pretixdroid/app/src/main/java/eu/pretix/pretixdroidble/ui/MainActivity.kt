@@ -1,4 +1,4 @@
-package eu.pretix.pretixdroid.ui
+package eu.pretix.pretixdroidble.ui
 
 import android.Manifest
 import android.app.Dialog
@@ -28,7 +28,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import eu.pretix.pretixdroid.buildUartPrinterString
+import eu.pretix.pretixdroidble.buildUartPrinterString
 
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
@@ -47,12 +47,12 @@ import java.util.TimerTask
 import eu.pretix.libpretixsync.api.PretixApi
 import eu.pretix.libpretixsync.check.TicketCheckProvider
 import eu.pretix.libpretixsync.db.QueuedCheckIn
-import eu.pretix.pretixdroid.AppConfig
-import eu.pretix.pretixdroid.BluetoothLeService
-import eu.pretix.pretixdroid.BuildConfig
-import eu.pretix.pretixdroid.PretixDroid
-import eu.pretix.pretixdroid.R
-import eu.pretix.pretixdroid.async.SyncService
+import eu.pretix.pretixdroidble.AppConfig
+import eu.pretix.pretixdroidble.BluetoothLeService
+import eu.pretix.pretixdroidble.BuildConfig
+import eu.pretix.pretixdroidble.PretixDroid
+import eu.pretix.pretixdroidble.R
+import eu.pretix.pretixdroidble.async.SyncService
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 
 class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaPlayer.OnCompletionListener {

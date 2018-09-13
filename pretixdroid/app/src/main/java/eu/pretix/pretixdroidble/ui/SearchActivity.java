@@ -1,4 +1,4 @@
-package eu.pretix.pretixdroid.ui;
+package eu.pretix.pretixdroidble.ui;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -25,9 +25,9 @@ import java.util.List;
 
 import eu.pretix.libpretixsync.check.CheckException;
 import eu.pretix.libpretixsync.check.TicketCheckProvider;
-import eu.pretix.pretixdroid.PretixDroid;
-import eu.pretix.pretixdroid.R;
-import eu.pretix.pretixdroid.async.SyncService;
+import eu.pretix.pretixdroidble.PretixDroid;
+import eu.pretix.pretixdroidble.R;
+import eu.pretix.pretixdroidble.async.SyncService;
 
 public class SearchActivity extends AppCompatActivity {
 
