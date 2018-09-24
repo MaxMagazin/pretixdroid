@@ -70,6 +70,8 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
     private var timer: Timer? = null
     private var questionsDialog: Dialog? = null
     private var unpaidDialog: Dialog? = null
+    private var syncStatusText: String? = null
+    private var initialOrderSyncProgress: Int = -1
 //    private var mqttManager: MqttManager? = null
 
     private val TAG = MainActivity::class.java.simpleName
@@ -136,6 +138,25 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
                 }
 
             }
+        }
+    }
+
+    private val initialOrderSyncProgressReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.hasExtra("PROGRESS")) {
+                initialOrderSyncProgress = intent.getIntExtra("PROGRESS", -1)
+//                System.out.println("initial order sync progress: " + progress)
+
+                if (initialOrderSyncProgress > -1) {
+                    val tvSyncStatusView = (findViewById<View>(R.id.tvSyncStatus) as TextView)
+                    tvSyncStatusView.text = syncStatusText + "\n(sync: " + initialOrderSyncProgress + "%)"
+                    //TODO 1. update to a dialog, clean ResourceLastModified db value if dialog is canceled
+                }
+            }
+        }
+
+        fun getIntentFilter(): IntentFilter {
+            return IntentFilter("eu.pretix.pretixdroid.INITIAL_ORDER_SYNC_PROGRESS")
         }
     }
 
@@ -301,6 +322,8 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
             }
         }
 
+        registerReceiver(initialOrderSyncProgressReceiver, initialOrderSyncProgressReceiver.getIntentFilter())
+
         timer = Timer()
         timer!!.schedule(SyncTriggerTask(), 1000, 10000)
         timer!!.schedule(UpdateSyncStatusTask(), 500, 500)
@@ -317,6 +340,7 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
         timer!!.cancel()
 
         unregisterReceiver(mGattUpdateReceiver)
+        unregisterReceiver(initialOrderSyncProgressReceiver)
     }
 
     override fun onDestroy() {
@@ -415,24 +439,27 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
             } else {
                 findViewById<View>(R.id.rlSyncStatus).setBackgroundColor(ContextCompat.getColor(this, R.color.scan_result_ok))
             }
-            val text: String
             val diff = System.currentTimeMillis() - config!!.lastDownload
             if (config!!.lastDownload == 0L) {
-                text = getString(R.string.sync_status_never)
+                syncStatusText = getString(R.string.sync_status_never)
+                if (initialOrderSyncProgress > -1) {
+                    syncStatusText += "\n(sync: " + initialOrderSyncProgress + "%)"
+                    //TODO update to a dialog
+                }
             } else if (diff > 24 * 3600 * 1000) {
                 val days = (diff / (24 * 3600 * 1000)).toInt()
-                text = resources.getQuantityString(R.plurals.time_days, days, days)
+                syncStatusText = resources.getQuantityString(R.plurals.time_days, days, days)
             } else if (diff > 3600 * 1000) {
                 val hours = (diff / (3600 * 1000)).toInt()
-                text = resources.getQuantityString(R.plurals.time_hours, hours, hours)
+                syncStatusText = resources.getQuantityString(R.plurals.time_hours, hours, hours)
             } else if (diff > 60 * 1000) {
                 val mins = (diff / (60 * 1000)).toInt()
-                text = resources.getQuantityString(R.plurals.time_minutes, mins, mins)
+                syncStatusText = resources.getQuantityString(R.plurals.time_minutes, mins, mins)
             } else {
-                text = getString(R.string.sync_status_now)
+                syncStatusText = getString(R.string.sync_status_now)
             }
 
-            (findViewById<View>(R.id.tvSyncStatus) as TextView).text = text
+            (findViewById<View>(R.id.tvSyncStatus) as TextView).text = syncStatusText
         } else {
             findViewById<View>(R.id.rlSyncStatus).visibility = View.GONE
         }
