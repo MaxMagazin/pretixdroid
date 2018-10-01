@@ -1,7 +1,11 @@
+@file:Suppress("DEPRECATION")
+
 package eu.pretix.pretixdroid.ui
 
 import android.Manifest
 import android.app.Dialog
+import android.app.DialogFragment
+import android.app.ProgressDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -72,7 +76,7 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
     private var unpaidDialog: Dialog? = null
     private var syncStatusText: String? = null
     private var initialOrderSyncProgress: Int = -1
-//    private var mqttManager: MqttManager? = null
+    private var progressDialog: InitialSyncProgressDialog? = null
 
     private val TAG = MainActivity::class.java.simpleName
     private var mDeviceName: String? = null
@@ -148,9 +152,20 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
 //                System.out.println("initial order sync progress: " + progress)
 
                 if (initialOrderSyncProgress > -1) {
-                    val tvSyncStatusView = (findViewById<View>(R.id.tvSyncStatus) as TextView)
-                    tvSyncStatusView.text = syncStatusText + "\n(sync: " + initialOrderSyncProgress + "%)"
-                    //TODO 1. update to a dialog, clean ResourceLastModified db value if dialog is canceled
+
+                    val dialog = progressDialog ?: InitialSyncProgressDialog()
+
+                    if (progressDialog == null){
+                        progressDialog = dialog
+
+                        val fm = this@MainActivity.fragmentManager
+                        dialog.show(fm, "InitialSyncProgressDialog")
+                    }
+
+                    dialog.updateProgress(initialOrderSyncProgress)
+
+                    //TODO 1. allow dialog to be dismissed but with buttong, after that clean ResourceLastModified db value if dialog is canceled
+
                 }
             }
         }
