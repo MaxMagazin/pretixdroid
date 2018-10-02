@@ -53,9 +53,9 @@ public class SyncService extends IntentService {
                 upload_interval,
                 download_interval
         );
-        sm.sync(false, new InitialOrderSyncAdapter.OnInitialOrderSyncProgressListener() {
+        sm.sync(false, new InitialOrderSyncAdapter.OnOrderSyncProgressListener() {
             @Override
-            public void onInitialOrderSyncProgress(int percentage) {
+            public void onOrderSyncProgress(int percentage) {
                 Intent intent = new Intent("eu.pretix.pretixdroid.INITIAL_ORDER_SYNC_PROGRESS");
                 intent.putExtra("PROGRESS", percentage);
                 sendBroadcast(intent); //broadcast for UI

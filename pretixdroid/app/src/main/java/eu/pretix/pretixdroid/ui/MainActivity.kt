@@ -160,12 +160,17 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
 
                         val fm = this@MainActivity.fragmentManager
                         dialog.show(fm, "InitialSyncProgressDialog")
+                        dialog.setOnDismissListener(object : InitialSyncProgressDialog.CancelDialogListener {
+                            override fun onDialogCancel() {
+                            }
+                        })
                     }
 
-                    dialog.updateProgress(initialOrderSyncProgress)
+                    dialog.updateProgress(context, initialOrderSyncProgress)
 
-                    //TODO 1. allow dialog to be dismissed but with buttong, after that clean ResourceLastModified db value if dialog is canceled
-
+                    if (initialOrderSyncProgress >= 100) {
+                        dialog.dismiss()
+                    }
                 }
             }
         }
@@ -457,10 +462,6 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
             val diff = System.currentTimeMillis() - config!!.lastDownload
             if (config!!.lastDownload == 0L) {
                 syncStatusText = getString(R.string.sync_status_never)
-                if (initialOrderSyncProgress > -1) {
-                    syncStatusText += "\n(sync: " + initialOrderSyncProgress + "%)"
-                    //TODO update to a dialog
-                }
             } else if (diff > 24 * 3600 * 1000) {
                 val days = (diff / (24 * 3600 * 1000)).toInt()
                 syncStatusText = resources.getQuantityString(R.plurals.time_days, days, days)
