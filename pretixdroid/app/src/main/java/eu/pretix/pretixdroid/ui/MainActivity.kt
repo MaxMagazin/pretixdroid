@@ -1,7 +1,11 @@
+@file:Suppress("DEPRECATION")
+
 package eu.pretix.pretixdroid.ui
 
 import android.Manifest
 import android.app.Dialog
+import android.app.DialogFragment
+import android.app.ProgressDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -70,7 +74,9 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
     private var timer: Timer? = null
     private var questionsDialog: Dialog? = null
     private var unpaidDialog: Dialog? = null
-//    private var mqttManager: MqttManager? = null
+    private var syncStatusText: String? = null
+    private var initialOrderSyncProgress: Int = -1
+    private var progressDialog: InitialSyncProgressDialog? = null
 
     private val TAG = MainActivity::class.java.simpleName
     private var mDeviceName: String? = null
@@ -136,6 +142,41 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
                 }
 
             }
+        }
+    }
+
+    private val initialOrderSyncProgressReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.hasExtra("PROGRESS")) {
+                initialOrderSyncProgress = intent.getIntExtra("PROGRESS", -1)
+//                System.out.println("initial order sync progress: " + progress)
+
+                if (initialOrderSyncProgress > -1) {
+
+                    val dialog = progressDialog ?: InitialSyncProgressDialog()
+
+                    if (progressDialog == null){
+                        progressDialog = dialog
+
+                        val fm = this@MainActivity.fragmentManager
+                        dialog.show(fm, "InitialSyncProgressDialog")
+                        dialog.setOnDismissListener(object : InitialSyncProgressDialog.CancelDialogListener {
+                            override fun onDialogCancel() {
+                            }
+                        })
+                    }
+
+                    dialog.updateProgress(context, initialOrderSyncProgress)
+
+                    if (initialOrderSyncProgress >= 100) {
+                        dialog.dismiss()
+                    }
+                }
+            }
+        }
+
+        fun getIntentFilter(): IntentFilter {
+            return IntentFilter("eu.pretix.pretixdroid.INITIAL_ORDER_SYNC_PROGRESS")
         }
     }
 
@@ -301,6 +342,8 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
             }
         }
 
+        registerReceiver(initialOrderSyncProgressReceiver, initialOrderSyncProgressReceiver.getIntentFilter())
+
         timer = Timer()
         timer!!.schedule(SyncTriggerTask(), 1000, 10000)
         timer!!.schedule(UpdateSyncStatusTask(), 500, 500)
@@ -317,6 +360,7 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
         timer!!.cancel()
 
         unregisterReceiver(mGattUpdateReceiver)
+        unregisterReceiver(initialOrderSyncProgressReceiver)
     }
 
     override fun onDestroy() {
@@ -415,24 +459,23 @@ class MainActivity : AppCompatActivity(), ZXingScannerView.ResultHandler, MediaP
             } else {
                 findViewById<View>(R.id.rlSyncStatus).setBackgroundColor(ContextCompat.getColor(this, R.color.scan_result_ok))
             }
-            val text: String
             val diff = System.currentTimeMillis() - config!!.lastDownload
             if (config!!.lastDownload == 0L) {
-                text = getString(R.string.sync_status_never)
+                syncStatusText = getString(R.string.sync_status_never)
             } else if (diff > 24 * 3600 * 1000) {
                 val days = (diff / (24 * 3600 * 1000)).toInt()
-                text = resources.getQuantityString(R.plurals.time_days, days, days)
+                syncStatusText = resources.getQuantityString(R.plurals.time_days, days, days)
             } else if (diff > 3600 * 1000) {
                 val hours = (diff / (3600 * 1000)).toInt()
-                text = resources.getQuantityString(R.plurals.time_hours, hours, hours)
+                syncStatusText = resources.getQuantityString(R.plurals.time_hours, hours, hours)
             } else if (diff > 60 * 1000) {
                 val mins = (diff / (60 * 1000)).toInt()
-                text = resources.getQuantityString(R.plurals.time_minutes, mins, mins)
+                syncStatusText = resources.getQuantityString(R.plurals.time_minutes, mins, mins)
             } else {
-                text = getString(R.string.sync_status_now)
+                syncStatusText = getString(R.string.sync_status_now)
             }
 
-            (findViewById<View>(R.id.tvSyncStatus) as TextView).text = text
+            (findViewById<View>(R.id.tvSyncStatus) as TextView).text = syncStatusText
         } else {
             findViewById<View>(R.id.rlSyncStatus).visibility = View.GONE
         }

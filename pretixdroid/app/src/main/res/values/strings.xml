@@ -100,4 +100,6 @@
     <string name="menu_disconnected">BLE Disconnected</string>
     <string name="pref_speaker_question">Is this a Speaker Badge?</string>
     <string name="no">No</string>
+    <string name="initial_synchronization">Initial synchronization</string>
+    <string name="progress_formatted">Downloading data. Please wait.. %1$d%%</string>
 </resources>

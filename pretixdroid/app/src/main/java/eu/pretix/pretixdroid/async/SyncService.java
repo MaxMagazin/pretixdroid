@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import eu.pretix.libpretixsync.api.PretixApi;
+import eu.pretix.libpretixsync.sync.InitialOrderSyncAdapter;
 import eu.pretix.libpretixsync.sync.SyncManager;
 import eu.pretix.pretixdroid.AndroidHttpClientFactory;
 import eu.pretix.pretixdroid.AndroidSentryImplementation;
@@ -52,7 +53,14 @@ public class SyncService extends IntentService {
                 upload_interval,
                 download_interval
         );
-        sm.sync(false);
+        sm.sync(false, new InitialOrderSyncAdapter.OnOrderSyncProgressListener() {
+            @Override
+            public void onOrderSyncProgress(int percentage) {
+                Intent intent = new Intent("eu.pretix.pretixdroid.INITIAL_ORDER_SYNC_PROGRESS");
+                intent.putExtra("PROGRESS", percentage);
+                sendBroadcast(intent); //broadcast for UI
+            }
+        });
     }
 
 }
